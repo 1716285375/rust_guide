@@ -7,7 +7,13 @@ repos:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
     -   id: check-yaml
+    -   id: check-json
+    -   id: check-toml
     -   id: check-added-large-files
+    -   id: check-case-conflict
+    -   id: check-merge-conflict
+    -   id: mixed-line-ending
+        args: [--fix=crlf]  # Windows 使用 CRLF
 
     # Rust 特定检查 - 使用本地命令方式
 -   repo: local

@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # 当推送 v 开头的 tag 时触发
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      # 检出代码，并获取全部 Git 历史记录以供 git-cliff 使用
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 使用新的、维护更积极的 Action 来设置 Rust 环境
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy # 如果需要，可以在这里添加组件
+
+      # 构建项目
+      - name: Build project
+        run: cargo build --release
+
+      # 自动生成变更日志
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v2
+        with:
+          # 请确保仓库根目录有 cliff.toml，否则可考虑移除本行使用默认配置
+          config: cliff.toml
+          args: --verbose
+        env:
+          OUTPUT: CHANGELOG.md
+
+      # 创建 GitHub Release
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: CHANGELOG.md  # 使用生成的 changelog 作为 release 说明
+          files: |
+            target/release/rust_hello  # 请确认此文件名与您的项目生成的可执行文件一致
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -13,44 +13,34 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4  # 将代码仓库检出到运行器
+      uses: actions/checkout@v4
 
-    - name: Install Rust Toolchain
-      uses: actions-rs/toolchain@v1
+    # 使用官方推荐的 Rust setup action
+    - name: Setup Rust
+      uses: actions-rust-lang/setup-rust-toolchain@v1
       with:
         toolchain: stable
-        components: rustfmt, clippy  # 安装rustfmt和clippy组件
-        override: true
+        components: rustfmt, clippy
+        # 添加缓存以加速后续构建
+        cache: true
+        cache-key: cargo-${{ hashFiles('**/Cargo.lock') }}
 
-    # 依赖安全检查 (使用你已配置的cargo-deny)
+    # 依赖安全检查
     - name: Run cargo deny
-      uses: actions-rs/cargo@v1
-      with:
-        command: deny
-        args: check
+      run: cargo deny check
 
     # 基础编译检查
     - name: Run cargo check
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
+      run: cargo check
 
     # 代码格式化检查
     - name: Run cargo fmt
-      uses: actions-rs/cargo@v1
-      with:
-        command: fmt
-        args: --all -- --check
+      run: cargo fmt --all -- --check
 
     # Clippy Lint 检查
     - name: Run cargo clippy
-      uses: actions-rs/cargo@v1
-      with:
-        command: clippy
-        args: -- -D warnings
+      run: cargo clippy -- -D warnings
 
     # 运行测试
     - name: Run cargo test
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
+      run: cargo test
