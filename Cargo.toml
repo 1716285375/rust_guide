@@ -1,0 +1,8 @@
+[package]
+name = "rust_hello"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"  # 添加这一行，使用双许可证
+
+
+[dependencies]

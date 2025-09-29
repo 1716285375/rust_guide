@@ -1,0 +1,66 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+
+    # Rust 特定检查 - 使用本地命令方式
+-   repo: local
+    hooks:
+    # cargo-fmt: 代码格式化检查
+    -   id: cargo-fmt
+        name: cargo fmt
+        entry: powershell  -Command "cargo fmt -- --check"
+        language: system
+        files: \.rs$
+        pass_filenames: false
+        args: []
+
+    # cargo-deny: 依赖安全检查
+    -   id: cargo-deny
+        name: cargo deny
+        entry: powershell  -Command "cargo deny check"
+        language: system
+        files: \.(rs|toml)$
+        pass_filenames: false
+        args: []
+
+    # typos: 拼写检查
+    -   id: typos
+        name: typos
+        entry: powershell  -Command "typos"
+        language: system
+        files: \.(rs|toml|md|txt)$
+        pass_filenames: true
+
+    # cargo-check: 基础编译检查
+    -   id: cargo-check
+        name: cargo check
+        entry: powershell  -Command "cargo check"
+        language: system
+        files: \.rs$
+        pass_filenames: false
+        args: []
+
+    # cargo-clippy: 代码lint检查
+    -   id: cargo-clippy
+        name: cargo clippy
+        entry: powershell  -Command "cargo clippy -- -D warnings"
+        language: system
+        files: \.rs$
+        pass_filenames: false
+        args: []
+
+    # cargo-test: 单元测试
+    -   id: cargo-test
+        name: cargo test
+        entry: powershell  -Command "cargo test"
+        language: system
+        files: \.rs$
+        pass_filenames: false
+        args: []
