@@ -25,6 +25,10 @@ jobs:
         cache: true
         cache-key: cargo-${{ hashFiles('**/Cargo.lock') }}
 
+    # 安装 cargo-deny 工具
+    - name: Install cargo-deny
+      run: cargo install cargo-deny --locked
+
     # 依赖安全检查
     - name: Run cargo deny
       run: cargo deny check
