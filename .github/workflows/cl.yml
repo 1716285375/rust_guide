@@ -1,0 +1,56 @@
+name: Rust CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_test:
+    name: Build, Test and Lint
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4  # 将代码仓库检出到运行器
+
+    - name: Install Rust Toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        components: rustfmt, clippy  # 安装rustfmt和clippy组件
+        override: true
+
+    # 依赖安全检查 (使用你已配置的cargo-deny)
+    - name: Run cargo deny
+      uses: actions-rs/cargo@v1
+      with:
+        command: deny
+        args: check
+
+    # 基础编译检查
+    - name: Run cargo check
+      uses: actions-rs/cargo@v1
+      with:
+        command: check
+
+    # 代码格式化检查
+    - name: Run cargo fmt
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: --all -- --check
+
+    # Clippy Lint 检查
+    - name: Run cargo clippy
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: -- -D warnings
+
+    # 运行测试
+    - name: Run cargo test
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
