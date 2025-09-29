@@ -22,7 +22,13 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-          components: rustfmt, clippy # 如果需要，可以在这里添加组件
+          components: rustfmt, clippy
+          cache: true
+          cache-key: cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      # 先安装 jq，确保后续步骤可用
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       # 构建项目
       - name: Build project
